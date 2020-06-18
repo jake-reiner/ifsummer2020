@@ -1,0 +1,44 @@
+* {
+    text-align: center;
+    margin: 0px;
+}
+
+body {
+    background-image: url("giphy.gif");;
+}
+
+
+h1 {
+	font-size: 15rem;
+    color: #fcedd8;
+    font-family: 'Niconne', cursive;
+    font-weight: 700;
+    text-shadow: 5px 5px 0px #eb452b, 
+              10px 10px 0px #efa032, 
+              15px 15px 0px #46b59b, 
+              20px 20px 0px #017e7f, 
+              25px 25px 0px #052939, 
+              30px 30px 0px #c11a2b, 
+              35px 35px 0px #c11a2b, 
+              40px 40px 0px #c11a2b, 
+              45px 45px 0px #c11a2b;
+}
+
+h2 {
+    font-size:120px;
+    letter-spacing:0.1em;
+    -webkit-text-fill-color: transparent;
+    -webkit-text-stroke-width: 3px;
+    -webkit-text-stroke-color: white;
+    text-shadow: 
+        8px 8px #ff1f8f,
+        20px 20px #000000;
+  }
+
+p {
+    margin-top: 150px;
+   font-weight: bold;
+   font-family: 'Lobster', cursive;
+   font-size: 40px;
+   color: white;
+}
