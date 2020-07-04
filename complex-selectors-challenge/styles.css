@@ -31,10 +31,10 @@ img {
 }
 
 .shows > li {
-    border: 1px solid black;
+    border-top: 1px solid black;
 }
 
-nav .selected {
+nav .selected a {
     font-weight: bold;
     color: black;
 }
@@ -51,7 +51,12 @@ nav .selected {
     font-style: italic;
 }
 
-#last-season {
-    font-size: .7rem;
+#game-of-thrones .seasons li:nth-of-type(9):after {
+    content: "*";
+}
+
+#game-of-thrones .seasons:after {
+    content: "*Final Season";
+    font-size: 0.7rem;
     color: #999;
 }

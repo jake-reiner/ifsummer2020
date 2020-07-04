@@ -26,6 +26,8 @@
     height: 700px;
     background-color: blueviolet;
     padding-top: 18px;
+    width: 970px;
+    margin: 0 auto 0 auto;
 }
 
 .section-2 h1 {
@@ -35,13 +37,13 @@
 }
 
 .section-2 p {
-    margin: 10px 320px 0 320px;
+    margin-top: 10px;
     font-size: 14pt;
 }
 
 .section-2 img {
     float: right;
-    margin: 0 321px 30px 30px;
+    margin-right:10px;
 }
 
 .section-3 {
@@ -64,7 +66,8 @@
 }
 
 .section-3 ul {
-    margin: 0 320px 0 320px;
+    width: 970px;
+    margin: 0 auto 0 auto;
     display: grid;
     grid-template-columns: 1fr 1fr;
 }
@@ -98,5 +101,6 @@
 .section-4 p {
     text-align: center;
     font-size: 20pt;
-    margin: 0 420px 0 420px;
+    width: 750px;
+    margin: 0 auto 0 auto;
 }
