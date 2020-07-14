@@ -1,292 +1,228 @@
-<!doctype html>
-<!--[if lt IE 7 ]> <html lang="en" class="ie6"> <![endif]-->
-<!--[if IE 7 ]>    <html lang="en" class="ie7"> <![endif]-->
-<!--[if IE 8 ]>    <html lang="en" class="ie8"> <![endif]-->
-<!--[if IE 9 ]>    <html lang="en" class="ie9"> <![endif]-->
-<!--[if !IE]><!--> <html lang="en"> <!--<![endif]-->
-<head>
-<script type="text/javascript" src="extras/jquery.min.1.7.js"></script>
-<script type="text/javascript" src="extras/jquery-ui-1.8.20.custom.min.js"></script>
-<script type="text/javascript" src="extras/jquery.mousewheel.min.js"></script>
-<script type="text/javascript" src="extras/modernizr.2.5.3.min.js"></script>
-<script type="text/javascript" src="lib/hash.js"></script>
-</head>
-<body>
-
-<div id="canvas">
-	<div id="book-zoom">
-		<div class="sj-book">
-			<div depth="5" class="hard"> <div class="side"></div> </div>
-			<div depth="5" class="hard front-side"> <div class="depth"></div> </div>
-			<div class="own-size"></div>
-			<div class="own-size even"></div>
-			<div class="hard fixed back-side p111"> <div class="depth"></div> </div>
-			<div class="hard p112"></div>
-		</div>
-	</div>
-	<div id="slider-bar" class="turnjs-slider">
-		<div id="slider"></div>
-	</div>
-</div>
-
-
-<script type="text/javascript">
-
-function loadApp() {
-	
-	var flipbook = $('.sj-book');
-
-	// Check if the CSS was already loaded
-	
-	if (flipbook.width()==0 || flipbook.height()==0) {
-		setTimeout(loadApp, 10);
-		return;
-	}
-
-	// Mousewheel
-
-	$('#book-zoom').mousewheel(function(event, delta, deltaX, deltaY) {
-
-		var data = $(this).data(),
-			step = 30,
-			flipbook = $('.sj-book'),
-			actualPos = $('#slider').slider('value')*step;
-
-		if (typeof(data.scrollX)==='undefined') {
-			data.scrollX = actualPos;
-			data.scrollPage = flipbook.turn('page');
-		}
-
-		data.scrollX = Math.min($( "#slider" ).slider('option', 'max')*step,
-			Math.max(0, data.scrollX + deltaX));
-
-		var actualView = Math.round(data.scrollX/step),
-			page = Math.min(flipbook.turn('pages'), Math.max(1, actualView*2 - 2));
-
-		if ($.inArray(data.scrollPage, flipbook.turn('view', page))==-1) {
-			data.scrollPage = page;
-			flipbook.turn('page', page);
-		}
-
-		if (data.scrollTimer)
-			clearInterval(data.scrollTimer);
-		
-		data.scrollTimer = setTimeout(function(){
-			data.scrollX = undefined;
-			data.scrollPage = undefined;
-			data.scrollTimer = undefined;
-		}, 1000);
-
-	});
-
-	// Slider
-
-	$( "#slider" ).slider({
-		min: 1,
-		max: 100,
-
-		start: function(event, ui) {
-
-			if (!window._thumbPreview) {
-				_thumbPreview = $('<div />', {'class': 'thumbnail'}).html('<div></div>');
-				setPreview(ui.value);
-				_thumbPreview.appendTo($(ui.handle));
-			} else
-				setPreview(ui.value);
-
-			moveBar(false);
-
-		},
-
-		slide: function(event, ui) {
-
-			setPreview(ui.value);
-
-		},
-
-		stop: function() {
-
-			if (window._thumbPreview)
-				_thumbPreview.removeClass('show');
-			
-			$('.sj-book').turn('page', Math.max(1, $(this).slider('value')*2 - 2));
-
-		}
-	});
-
-
-	// URIs
-	
-	Hash.on('^page\/([0-9]*)$', {
-		yep: function(path, parts) {
-
-			var page = parts[1];
-
-			if (page!==undefined) {
-				if ($('.sj-book').turn('is'))
-					$('.sj-book').turn('page', page);
-			}
-
-		},
-		nop: function(path) {
-
-			if ($('.sj-book').turn('is'))
-				$('.sj-book').turn('page', 1);
-		}
-	});
-
-	// Arrows
-
-	$(document).keydown(function(e){
-
-		var previous = 37, next = 39;
-
-		switch (e.keyCode) {
-			case previous:
-
-				$('.sj-book').turn('previous');
-
-			break;
-			case next:
-				
-				$('.sj-book').turn('next');
-
-			break;
-		}
-
-	});
-
-
-	// Flipbook
-
-	flipbook.bind(($.isTouch) ? 'touchend' : 'click', zoomHandle);
-
-	flipbook.turn({
-		elevation: 50,
-		acceleration: !isChrome(),
-		autoCenter: true,
-		gradients: true,
-		duration: 1000,
-		pages: 112,
-		when: {
-			turning: function(e, page, view) {
-				
-				var book = $(this),
-					currentPage = book.turn('page'),
-					pages = book.turn('pages');
-
-				if (currentPage>3 && currentPage<pages-3) {
-				
-					if (page==1) {
-						book.turn('page', 2).turn('stop').turn('page', page);
-						e.preventDefault();
-						return;
-					} else if (page==pages) {
-						book.turn('page', pages-1).turn('stop').turn('page', page);
-						e.preventDefault();
-						return;
-					}
-				} else if (page>3 && page<pages-3) {
-					if (currentPage==1) {
-						book.turn('page', 2).turn('stop').turn('page', page);
-						e.preventDefault();
-						return;
-					} else if (currentPage==pages) {
-						book.turn('page', pages-1).turn('stop').turn('page', page);
-						e.preventDefault();
-						return;
-					}
-				}
-
-				updateDepth(book, page);
-				
-				if (page>=2)
-					$('.sj-book .p2').addClass('fixed');
-				else
-					$('.sj-book .p2').removeClass('fixed');
-
-				if (page<book.turn('pages'))
-					$('.sj-book .p111').addClass('fixed');
-				else
-					$('.sj-book .p111').removeClass('fixed');
-
-				Hash.go('page/'+page).update();
-					
-			},
-
-			turned: function(e, page, view) {
-
-				var book = $(this);
-
-				if (page==2 || page==3) {
-					book.turn('peel', 'br');
-				}
-
-				updateDepth(book);
-				
-				$('#slider').slider('value', getViewNumber(book, page));
-
-				book.turn('center');
-
-			},
-
-			start: function(e, pageObj) {
-		
-				moveBar(true);
-
-			},
-
-			end: function(e, pageObj) {
-			
-				var book = $(this);
-
-				updateDepth(book);
-
-				setTimeout(function() {
-					
-					$('#slider').slider('value', getViewNumber(book));
-
-				}, 1);
-
-				moveBar(false);
-
-			},
-
-			missing: function (e, pages) {
-
-				for (var i = 0; i < pages.length; i++) {
-					addPage(pages[i], $(this));
-				}
-
-			}
-		}
-	});
-
-
-	$('#slider').slider('option', 'max', numberOfViews(flipbook));
-
-	flipbook.addClass('animated');
-
-	// Show canvas
-
-	$('#canvas').css({visibility: ''});
-}
-
-// Hide canvas
-
-$('#canvas').css({visibility: 'hidden'});
-
-// Load turn.js
-
-yepnope({
-	test : Modernizr.csstransforms,
-	yep: ['lib/turn.min.js'],
-	nope: ['lib/turn.html4.min.js', 'css/jquery.ui.html4.css', 'css/steve-jobs-html4.css'],
-	both: ['js/steve-jobs.js', 'css/jquery.ui.css', 'css/steve-jobs.css'],
-	complete: loadApp
-});
-
-</script>
-
-</body>
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width,initial-scale=1.0">
+        <link rel='stylesheet' href='checkboxes.css'>
+        <link rel="stylesheet" href="https://use.typekit.net/bnv0ofh.css">
+        
+        <link href='styles.css' rel='stylesheet'>
+    </head>
+
+    <body>
+        <div id='content'>
+            <h2 class='logo'>Simple luxery recipes for busy people</h2>
+            <h1 class='recipe-name'>Marinated Flank Steak</h1>
+
+            <div class='key'>
+                <div class='key-grid'>
+                    <div>Cook/Prep: 25 mins</div> <div>Total Time: 6 hrs 25 mins</div> <div>Servings: 6</div> <div>Difficulty: Easy/Moderate</div> <div>Health Rating: 7/10</div>
+                </div>
+            </div>
+
+            <img class='cover' src='cover.jpg'>
+
+            <div class='description'>
+                <div class='definition'>
+                    <h1>What is Flank Steak?</h1>
+                    <p>Flank steak is a lean, somewhat tough but flavorful cut of beef that benefits from the tenderizing effects of a marinade. It is best cooked medium rare and thinly sliced at an angle across the grain of the meat. Prepared this way, marinated, cooked quickly at high heat, and thinly sliced, flank steak practically melts in your mouth.</p>
+
+                    
+                </div>
+
+                <div class='nutritional-info'>
+                    <h1>Nutritional Info</h1>
+                    <table>
+                        <tr>
+                            <td>275 calories</td> <td>22.5g total fat</td> <td>27mg of cholesterol</td>
+                        </tr>
+                        <tr>
+                             <td>935mg of sodium</td> <td>3.4g of carbohydrates</td> <td>14.8g of protein</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+
+            <div class='instructions'>
+                <div class='ingrediants'>
+                    <h1>Ingrediants</h1>
+                    <h3>For 6 servings</h3>
+                    <form class="animated-inputs radio">
+                        <div class="each">
+                          <input id="a1" name="radios" type="checkbox" checked='true'>
+                          <label for="a1">
+                            ½ cup vegetable oil
+                            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                                          <path d="M27.8,18.6c-3.7,5.1-7.3,10.1-11,15.2c13.7-6.9,27.5-13.9,42.4-17.6c-4.5,5.5-10.4,9.7-15.7,14.5
+                          c-4.4,4-8.5,8.4-12.5,12.8C25,50,19,56.5,14.1,63.9c10.2-6.1,20.4-12.2,30.6-18.4c3.1-1.9,6.2-3.7,9.4-5.2c3.2-1.4,6.5-2.5,9.7-3.7
+                          c7.5-2.8,14.7-6.5,21.8-10.2c-4.2,3.7-9.4,6.1-13.9,9.4c-3.1,2.3-5.8,4.9-8.8,7.4c-3.5,2.9-7.3,5.4-10.7,8.4
+                          c-4.5,4.2-8,9.3-11.6,14.2c-4.6,6.1-9.6,11.9-14.3,17.9c9.7-8.4,17-19.5,27.5-26.9c7.1-5,15.3-8.2,23.6-10.6
+                          c2.9-0.8,5.8-1.6,8.4-3.1c-3.5,4.9-8.2,8.7-12.8,12.6c-7.6,6.7-14.5,14-20.7,22C62.7,74.1,71,66.1,81.4,63.2"/>
+                            </svg>
+                          </label>
+
+                        </div>
+                        <div class="each">
+                          <input id="a2" name="radios" type="checkbox">
+                          <label for="a2">
+                            ⅓ cup soy sauce
+                            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                                          <path d="M27.8,18.6c-3.7,5.1-7.3,10.1-11,15.2c13.7-6.9,27.5-13.9,42.4-17.6c-4.5,5.5-10.4,9.7-15.7,14.5
+                          c-4.4,4-8.5,8.4-12.5,12.8C25,50,19,56.5,14.1,63.9c10.2-6.1,20.4-12.2,30.6-18.4c3.1-1.9,6.2-3.7,9.4-5.2c3.2-1.4,6.5-2.5,9.7-3.7
+                          c7.5-2.8,14.7-6.5,21.8-10.2c-4.2,3.7-9.4,6.1-13.9,9.4c-3.1,2.3-5.8,4.9-8.8,7.4c-3.5,2.9-7.3,5.4-10.7,8.4
+                          c-4.5,4.2-8,9.3-11.6,14.2c-4.6,6.1-9.6,11.9-14.3,17.9c9.7-8.4,17-19.5,27.5-26.9c7.1-5,15.3-8.2,23.6-10.6
+                          c2.9-0.8,5.8-1.6,8.4-3.1c-3.5,4.9-8.2,8.7-12.8,12.6c-7.6,6.7-14.5,14-20.7,22C62.7,74.1,71,66.1,81.4,63.2"/>
+                            </svg>
+                          </label>
+                        </div>
+                        <div class="each">
+                            <input id="a3" name="radios" type="checkbox">
+                            <label for="a3">
+                              ¼ cup red wine vinegar
+                              <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M27.8,18.6c-3.7,5.1-7.3,10.1-11,15.2c13.7-6.9,27.5-13.9,42.4-17.6c-4.5,5.5-10.4,9.7-15.7,14.5
+                            c-4.4,4-8.5,8.4-12.5,12.8C25,50,19,56.5,14.1,63.9c10.2-6.1,20.4-12.2,30.6-18.4c3.1-1.9,6.2-3.7,9.4-5.2c3.2-1.4,6.5-2.5,9.7-3.7
+                            c7.5-2.8,14.7-6.5,21.8-10.2c-4.2,3.7-9.4,6.1-13.9,9.4c-3.1,2.3-5.8,4.9-8.8,7.4c-3.5,2.9-7.3,5.4-10.7,8.4
+                            c-4.5,4.2-8,9.3-11.6,14.2c-4.6,6.1-9.6,11.9-14.3,17.9c9.7-8.4,17-19.5,27.5-26.9c7.1-5,15.3-8.2,23.6-10.6
+                            c2.9-0.8,5.8-1.6,8.4-3.1c-3.5,4.9-8.2,8.7-12.8,12.6c-7.6,6.7-14.5,14-20.7,22C62.7,74.1,71,66.1,81.4,63.2"/>
+                              </svg>
+                            </label>
+                          </div>
+                          <div class="each">
+                            <input id="a4" name="radios" type="checkbox">
+                            <label for="a4">
+                              2 tablespoons fresh lemon juice  
+                              <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M27.8,18.6c-3.7,5.1-7.3,10.1-11,15.2c13.7-6.9,27.5-13.9,42.4-17.6c-4.5,5.5-10.4,9.7-15.7,14.5
+                            c-4.4,4-8.5,8.4-12.5,12.8C25,50,19,56.5,14.1,63.9c10.2-6.1,20.4-12.2,30.6-18.4c3.1-1.9,6.2-3.7,9.4-5.2c3.2-1.4,6.5-2.5,9.7-3.7
+                            c7.5-2.8,14.7-6.5,21.8-10.2c-4.2,3.7-9.4,6.1-13.9,9.4c-3.1,2.3-5.8,4.9-8.8,7.4c-3.5,2.9-7.3,5.4-10.7,8.4
+                            c-4.5,4.2-8,9.3-11.6,14.2c-4.6,6.1-9.6,11.9-14.3,17.9c9.7-8.4,17-19.5,27.5-26.9c7.1-5,15.3-8.2,23.6-10.6
+                            c2.9-0.8,5.8-1.6,8.4-3.1c-3.5,4.9-8.2,8.7-12.8,12.6c-7.6,6.7-14.5,14-20.7,22C62.7,74.1,71,66.1,81.4,63.2"/>
+                              </svg>
+                            </label>
+                          </div>
+                          <div class="each">
+                            <input id="a5" name="radios" type="checkbox">
+                            <label for="a5">
+                                1 & ½ tablespoons Worcestershire sauce
+                              <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M27.8,18.6c-3.7,5.1-7.3,10.1-11,15.2c13.7-6.9,27.5-13.9,42.4-17.6c-4.5,5.5-10.4,9.7-15.7,14.5
+                            c-4.4,4-8.5,8.4-12.5,12.8C25,50,19,56.5,14.1,63.9c10.2-6.1,20.4-12.2,30.6-18.4c3.1-1.9,6.2-3.7,9.4-5.2c3.2-1.4,6.5-2.5,9.7-3.7
+                            c7.5-2.8,14.7-6.5,21.8-10.2c-4.2,3.7-9.4,6.1-13.9,9.4c-3.1,2.3-5.8,4.9-8.8,7.4c-3.5,2.9-7.3,5.4-10.7,8.4
+                            c-4.5,4.2-8,9.3-11.6,14.2c-4.6,6.1-9.6,11.9-14.3,17.9c9.7-8.4,17-19.5,27.5-26.9c7.1-5,15.3-8.2,23.6-10.6
+                            c2.9-0.8,5.8-1.6,8.4-3.1c-3.5,4.9-8.2,8.7-12.8,12.6c-7.6,6.7-14.5,14-20.7,22C62.7,74.1,71,66.1,81.4,63.2"/>
+                              </svg>
+                            </label>
+                          </div>
+                          <div class="each">
+                            <input id="a6" name="radios" type="checkbox">
+                            <label for="a6">
+                                1 tablespoon Dijon mustard
+                              <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M27.8,18.6c-3.7,5.1-7.3,10.1-11,15.2c13.7-6.9,27.5-13.9,42.4-17.6c-4.5,5.5-10.4,9.7-15.7,14.5
+                            c-4.4,4-8.5,8.4-12.5,12.8C25,50,19,56.5,14.1,63.9c10.2-6.1,20.4-12.2,30.6-18.4c3.1-1.9,6.2-3.7,9.4-5.2c3.2-1.4,6.5-2.5,9.7-3.7
+                            c7.5-2.8,14.7-6.5,21.8-10.2c-4.2,3.7-9.4,6.1-13.9,9.4c-3.1,2.3-5.8,4.9-8.8,7.4c-3.5,2.9-7.3,5.4-10.7,8.4
+                            c-4.5,4.2-8,9.3-11.6,14.2c-4.6,6.1-9.6,11.9-14.3,17.9c9.7-8.4,17-19.5,27.5-26.9c7.1-5,15.3-8.2,23.6-10.6
+                            c2.9-0.8,5.8-1.6,8.4-3.1c-3.5,4.9-8.2,8.7-12.8,12.6c-7.6,6.7-14.5,14-20.7,22C62.7,74.1,71,66.1,81.4,63.2"/>
+                              </svg>
+                            </label>
+                          </div>
+                          <div class="each">
+                            <input id="a7" name="radios" type="checkbox">
+                            <label for="a7">
+                                2 cloves garlic, minced
+                              <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M27.8,18.6c-3.7,5.1-7.3,10.1-11,15.2c13.7-6.9,27.5-13.9,42.4-17.6c-4.5,5.5-10.4,9.7-15.7,14.5
+                            c-4.4,4-8.5,8.4-12.5,12.8C25,50,19,56.5,14.1,63.9c10.2-6.1,20.4-12.2,30.6-18.4c3.1-1.9,6.2-3.7,9.4-5.2c3.2-1.4,6.5-2.5,9.7-3.7
+                            c7.5-2.8,14.7-6.5,21.8-10.2c-4.2,3.7-9.4,6.1-13.9,9.4c-3.1,2.3-5.8,4.9-8.8,7.4c-3.5,2.9-7.3,5.4-10.7,8.4
+                            c-4.5,4.2-8,9.3-11.6,14.2c-4.6,6.1-9.6,11.9-14.3,17.9c9.7-8.4,17-19.5,27.5-26.9c7.1-5,15.3-8.2,23.6-10.6
+                            c2.9-0.8,5.8-1.6,8.4-3.1c-3.5,4.9-8.2,8.7-12.8,12.6c-7.6,6.7-14.5,14-20.7,22C62.7,74.1,71,66.1,81.4,63.2"/>
+                              </svg>
+                            </label>
+                          </div>
+                          <div class="each">
+                            <input id="a8" name="radios" type="checkbox">
+                            <label for="a8">
+                                ½ teaspoon ground black pepper
+                              <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M27.8,18.6c-3.7,5.1-7.3,10.1-11,15.2c13.7-6.9,27.5-13.9,42.4-17.6c-4.5,5.5-10.4,9.7-15.7,14.5
+                            c-4.4,4-8.5,8.4-12.5,12.8C25,50,19,56.5,14.1,63.9c10.2-6.1,20.4-12.2,30.6-18.4c3.1-1.9,6.2-3.7,9.4-5.2c3.2-1.4,6.5-2.5,9.7-3.7
+                            c7.5-2.8,14.7-6.5,21.8-10.2c-4.2,3.7-9.4,6.1-13.9,9.4c-3.1,2.3-5.8,4.9-8.8,7.4c-3.5,2.9-7.3,5.4-10.7,8.4
+                            c-4.5,4.2-8,9.3-11.6,14.2c-4.6,6.1-9.6,11.9-14.3,17.9c9.7-8.4,17-19.5,27.5-26.9c7.1-5,15.3-8.2,23.6-10.6
+                            c2.9-0.8,5.8-1.6,8.4-3.1c-3.5,4.9-8.2,8.7-12.8,12.6c-7.6,6.7-14.5,14-20.7,22C62.7,74.1,71,66.1,81.4,63.2"/>
+                              </svg>
+                            </label>
+                          </div>
+                          <div class="each">
+                            <input id="a9" name="radios" type="checkbox">
+                            <label for="a9">
+                                1 & ½ pounds flank steak
+                              <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M27.8,18.6c-3.7,5.1-7.3,10.1-11,15.2c13.7-6.9,27.5-13.9,42.4-17.6c-4.5,5.5-10.4,9.7-15.7,14.5
+                            c-4.4,4-8.5,8.4-12.5,12.8C25,50,19,56.5,14.1,63.9c10.2-6.1,20.4-12.2,30.6-18.4c3.1-1.9,6.2-3.7,9.4-5.2c3.2-1.4,6.5-2.5,9.7-3.7
+                            c7.5-2.8,14.7-6.5,21.8-10.2c-4.2,3.7-9.4,6.1-13.9,9.4c-3.1,2.3-5.8,4.9-8.8,7.4c-3.5,2.9-7.3,5.4-10.7,8.4
+                            c-4.5,4.2-8,9.3-11.6,14.2c-4.6,6.1-9.6,11.9-14.3,17.9c9.7-8.4,17-19.5,27.5-26.9c7.1-5,15.3-8.2,23.6-10.6
+                            c2.9-0.8,5.8-1.6,8.4-3.1c-3.5,4.9-8.2,8.7-12.8,12.6c-7.6,6.7-14.5,14-20.7,22C62.7,74.1,71,66.1,81.4,63.2"/>
+                              </svg>
+                            </label>
+                          </div>
+                      </form>
+                    
+                    
+                </div>
+
+                <div class='directions'>
+                    <h1>Directions</h1>
+                    <div class='step'>
+                        <p>Get a shallow glass dish.</p>
+                        <img src='images/step1.png'>
+                    </div>
+                    <div class='step'>
+                        <p>Pour the following into the dish: ½ cup vegetable oil, ⅓ cup soy sauce, ¼ cup red wine vinegar, 2 tablespoons fresh lemon juice, 1 & ½ tablespoons Worcestershire sauce, 1 tablespoon Dijon mustard, 2 cloves minced garlic, and ½ teaspoon ground black pepper.</p>
+                        <img src='images/step2.png'>
+                    </div>
+                    <div>
+                        <p>Mix well.</p>
+                        <img src='images/step2-2.png'>
+                    </div>
+                    <div class='step'>
+                        <p>Place the meat in the dish. Flip the meat around until it is thoroughly covered in the marinade.</p>
+                        <img src='images/step3.png'>
+                    </div>
+                    <div class='step'>
+                        <p>Cover the dish and refrigerate.</p>
+                        <img src='images/step4.png'>
+                    </div>
+                    <div class='step'>
+                        <p>Wait 6 hours.</p>
+                    </div>
+                    <div class='step'>
+                        <p>Preheat grill at medium-high heat.</p>
+                    </div>
+                    <div class='step'>
+                        <p>Soak a paper towel in vegetable oil and spread the oil on the grates of the grill.</p>
+                        <img src='images/step7.png'>
+                    </div>
+                    <div class='step'>
+                        <p>Place steak on the grill. Cook 5 minutes per a side or until desired doneness.</p>
+                        <img src='images/step8.png'>
+                    </div>
+                    <div class='step'>
+                        <p>Let steak sit for 5 minutes.</p>
+                        <img src='images/step9.png'>
+                    </div>
+                    <div class='step'>
+                        <p>Cut the steak into strips accross the grain.</p>
+                        <img src='images/step10.png'>
+                    </div>
+                    <div class='step'>
+                        <p>Done!</p>
+                        <img src='images/step11.png'>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </body>
 </html>

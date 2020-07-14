@@ -1,0 +1,153 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: #FAD7A0;
+}
+
+#content {
+    width: 960px;
+    margin: auto;
+    padding-top: 10px;
+}
+
+.logo {
+    font-size: 10pt;
+}
+
+.recipe-name {
+    text-align: center;
+    margin: 30px 0 30px 0;
+    font-size: 63pt;
+    font-family: liza-caps-new, sans-serif;
+    font-weight: 400;
+    font-style: normal;
+}
+
+.key-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+}
+
+.key-grid div {
+    text-align: center;
+}
+
+.key {
+    border: 1px solid black;
+    margin-bottom: 5px;
+    padding: 3px;
+}
+
+.cover {
+    width: 100%;
+    display: block;
+}
+
+.description {
+    padding: 20px 20px 20px 20px;
+    background-color: #FFEAC9;
+    font-family: sweet-sans-pro, sans-serif;
+    font-weight: 500;
+    font-style: normal;
+}
+
+.definition {
+    font-size: 12pt;
+}
+
+.definition h1 {
+    text-align: center;
+    margin: 0 0 20px 0;
+}
+
+.nutritional-info h1 {
+    text-align: center;
+    margin: 20px 0 20px 0;
+}
+
+.nutritional-info table {
+    width: 100%;
+}
+
+.nutritional-info table tr td {
+    text-align: center;
+    padding: 10px;
+}
+
+
+.instructions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding-top: 10px;
+    font-family: sweet-sans-pro, sans-serif;
+    font-weight: 500;
+    font-style: normal;
+}
+
+.instructions h1 {
+    padding-bottom: 20px;
+    text-align: center;
+    font-size: 50pt;
+    font-weight: 200;
+}
+
+.ingrediants h3 {
+    font-size: 10pt;
+}
+
+.directions img {
+    width:100%;
+    margin-bottom: -6px;
+}
+
+.directions div {
+    margin-bottom: 30px;
+    font-size: 20px;
+    border: 1px solid black;
+}
+
+.directions p {
+    margin: 10px;
+}
+
+@media (max-width: 960px) {
+    .instructions {
+        grid-template-columns: 1fr;
+        padding: 10px 20px 20px 20px;
+    }
+
+    .instructions h1 {
+        font-size: 80pt;
+    }
+
+    .directions div {
+        font-size: 40px;
+    }
+
+    .directions img {
+        margin-bottom: -12px;
+    }
+
+    .definition {
+        font-size: 18pt;
+    }
+
+    .nutritional-info table {
+        font-size: 18pt;
+    }
+
+    .description h1 {
+        font-size: 40pt;
+    }
+}
+
+@media (max-width: 600px) {
+    .key-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        font-size: 20pt;
+    }
+}
