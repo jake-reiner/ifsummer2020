@@ -1,0 +1,87 @@
+* {
+    padding: 0;
+    margin: 0;
+}
+
+h1 {
+    text-align: center;
+    margin: 30px;
+    font-family: 'Rowdies', cursive;
+    font-size: 40pt;
+    margin-bottom: 15vh;
+}
+
+#side-bar {
+    left: 0;
+    top: 0;
+    text-align: center;
+    width: 400px;
+    position: fixed;
+    height: 100%;
+    background-color: lightgray;
+}
+
+#side-bar a {
+    display: block;
+    padding: 20px;
+    font-size: 30pt;
+    color: black;
+    text-decoration: none;
+    font-family: 'Fredoka One', cursive;
+}
+
+#side-bar a:hover {
+    color:blue;
+}
+
+#content {
+    padding-left: 400px;
+    padding-top: 5vh;
+}
+
+#content > h2 {
+    font-family: 'Rowdies', cursive;
+    font-size: 30pt;
+    text-align: center;
+}
+
+#books-sidescroll {
+    overflow-x: scroll;
+    overflow-y: hidden;
+    white-space: nowrap;
+    margin-bottom: 50px;
+}
+
+.book {
+    display: inline-block;
+    width: 300px;
+    text-align: center;
+    border: 1px solid black;
+    margin: 10px;
+}
+
+
+.book img {
+    height: 250px;
+}
+
+#screenplays-sidescroll {
+    overflow-x: scroll;
+    overflow-y: hidden;
+    white-space: nowrap;
+}
+
+.screenplay {
+    display: inline-block;
+    width: 300px;
+    text-align: center;
+    border: 1px solid black;
+    margin: 10px;
+}
+
+
+.screenplay img {
+    height: 250px;
+}
+
+
