@@ -92,7 +92,7 @@ h2 {
 
 .book {
     display: inline-block;
-    width: 300px;
+    width: 400px;
     text-align: center;
     padding: 10px;
     margin: 10px;
@@ -103,6 +103,7 @@ h2 {
     height: 250px;
 }
 
+
 #screenplays-sidescroll {
     overflow-x: scroll;
     overflow-y: hidden;
@@ -111,7 +112,7 @@ h2 {
 
 .screenplay {
     display: inline-block;
-    width: 300px;
+    width: 400px;
     text-align: center;
     padding: 10px;
     margin: 10px;
@@ -130,6 +131,7 @@ h2 {
     padding: 30px;
     width: 900px;
     margin: auto;
+    position: relative;
 }
 
 .about-book img {
@@ -137,7 +139,9 @@ h2 {
 }
 
 .about-book p {
-    transform: translateY(25%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .about-book-reverse {
@@ -153,7 +157,9 @@ h2 {
 }
 
 .about-book-reverse p {
-    transform: translateY(25%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 #book-grid img {
