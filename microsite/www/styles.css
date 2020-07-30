@@ -176,11 +176,21 @@ h2 {
 .bio-right {
     float: right;
     margin: 10px 150px 10px 10px;
-    width: 250px;
+    width: 500px;
 }
 
 .bio-left {
     float: left;
     margin: 10px 10px 10px 150px;
-    width: 250px;
+    width: 500px;
+}
+
+.about-screenplay p {
+    margin: 10px 150px 100px 150px;
+}
+
+.about-screenplay img {
+    display: block;
+    margin: auto;
+    width: 400px;
 }
