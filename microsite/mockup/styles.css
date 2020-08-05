@@ -164,6 +164,7 @@ h2 {
 
 #book-grid img {
     padding: 30px;
+    width: 80%;
 }
 
 #book-grid {
@@ -193,4 +194,144 @@ h2 {
     display: block;
     margin: auto;
     width: 400px;
+}
+
+.mobile {
+    display: none;
+}
+
+.not-mobile {
+    display: initial;
+}
+
+@media (max-width: 1200px) {
+    .info {
+        margin: 20px 20px 20px 20px;
+    }
+
+    #side-bar {
+        width: 300px;
+    }
+
+    #content {
+        padding: 60px 0 60px 300px;
+    }
+
+    .about-screenplay p {
+        margin: 10px 10px 100px 10px;
+    }
+    
+    .about-book {
+        width: 900px;
+    }
+
+    .about-book-reverse {
+        width: 900px;
+    }
+
+    #book-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        width: 800px;
+        margin: auto;
+    }
+    
+}
+
+@media (max-width: 800px) {
+    #side-bar {
+        left: 0;
+        top: 0;
+        text-align: center;
+        width: 100%;
+        height: 100px;
+        padding-top: 0;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+    }
+    
+    #side-bar a {
+        display: block;
+        padding: 20px;
+        font-size: 17pt;
+        color: black;
+        text-decoration: none;
+        font-family: 'Fredoka One', cursive;
+    }
+    
+    #content {
+        padding: 160px 0 60px 0;
+    }
+
+    .bio-right {
+        display: block;
+        float: none;
+        margin: 10px auto 10px auto;
+        width: 500px;
+    }
+    
+    .bio-left {
+        display: block;
+        float: none;
+        margin: 10px auto 10px auto;
+        width: 500px;
+    }
+
+    .mobile {
+        display: initial;
+    }
+
+    .not-mobile {
+        display: none;
+       
+    }
+
+    #book-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        width: 600px;
+        margin: auto;
+    }
+    
+    
+}
+
+
+@media (max-width: 600px) {
+    #side-bar {
+        width: 100%;
+        height: 120px;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+
+    #side-bar a {
+        padding: 8px;
+        margin: 0;
+    }
+    
+    #content {
+        padding: 120px 0 60px 0;
+    }
+
+    .bio-right {
+        width: 100%;
+    }
+    
+    .bio-left {
+        width:100%;
+    }
+
+    .about-screenplay img {
+        width:100%;
+    }
+
+    #book-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        width: 100%;
+        margin: auto;
+    }
+    
+
 }

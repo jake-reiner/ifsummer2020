@@ -28,7 +28,7 @@ body {
 
 .key-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
 }
 
 .key-grid div {
@@ -61,11 +61,13 @@ body {
 .definition h1 {
     text-align: center;
     margin: 0 0 20px 0;
+    font-weight: 400;
 }
 
 .nutritional-info h1 {
     text-align: center;
     margin: 20px 0 20px 0;
+    font-weight: 400;
 }
 
 .nutritional-info table {
